@@ -14,11 +14,10 @@ const setupAndStartServer = async() => {
     app.use('/api', ApiRoutes);
 
     app.listen(PORT, async() => {
-        console.log(`Server is running at PORT ${PORT}`)
-
         if(DB_SYNC){
-            db.Sequelize.sync({alter: true});
+            db.sequelize.sync({alter: true});
         }
+        console.log(`Server is running at PORT ${PORT}`)
     })
 }
 
