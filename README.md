@@ -8,6 +8,3 @@
 
 - Environmen Variables
     - `PORT = 3000`
-    - `JWT_SECRET_KEY = {"YOUR_SECRET_KEY"}`
-    - `DB_SYNC = "true"`
-    - `user = "<sender mail address>"`
