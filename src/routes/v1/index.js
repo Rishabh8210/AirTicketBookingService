@@ -1,4 +1,5 @@
 const express = require('express');
+const { BookingController } = require('../../controllers/index');
 const router = express.Router();
 
 router.get('/hello', (req, res) => {
@@ -9,5 +10,7 @@ router.get('/hello', (req, res) => {
         err: {}
     });
 })
+
+router.post('/bookings', BookingController.createBooking);
 
 module.exports = router;

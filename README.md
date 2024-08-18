@@ -8,5 +8,6 @@
 
 - Inside the `src/config` folder create a new file `config.json` and then add the following piece of json
 - Environmen Variables
-    - `PORT = 3000`
-    - `DB_SYNC = "true"`
+    - `PORT = <PORT>`
+    - `DB_SYNC = true` use true when you want to sync your db else just comment it or remove it form `.env` file.
+    - `FLIGHT_SERVICE_PATH='<FLIGHT SERVICE PATH/LINK>'` for example `'http://localhost:3000'`
