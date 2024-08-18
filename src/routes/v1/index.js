@@ -12,5 +12,6 @@ router.get('/hello', (req, res) => {
 })
 
 router.post('/bookings', BookingController.createBooking);
+router.patch('/bookings/:id', BookingController.cancelBooking);
 
 module.exports = router;

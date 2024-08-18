@@ -22,17 +22,33 @@ class BookingRepository{
 
     update = async (bookingId, data) => {
         try {
-            const response = await Booking.findByPk(bookingId);
-            if(data.status){
-                response.status = data.status
-            }
-            await response.save();
-            return response;
+            const response = await Booking.update(data, {
+                where: {
+                    id: bookingId
+                }
+            })
+            const updatedFlight = await Booking.findByPk(bookingId);
+            return updatedFlight;
         } catch (error) {
             throw new AppError(
                 'RepositoryError',
                 "Can't create Booking",
                 "There was some issue updating in the booking, please try again later",
+                StatusCodes.INTERNAL_SERVER_ERROR
+            )
+        }
+    }
+
+    get = async(bookingId) => {
+        try {
+            console.log(bookingId)
+            const response = await Booking.findByPk(bookingId);
+            return response;
+        } catch (error) {
+            throw new AppError(
+                'RepositoryError',
+                "Can't fetch Booking details",
+                "There was some issue fetching in the booking, please try again later",
                 StatusCodes.INTERNAL_SERVER_ERROR
             )
         }
