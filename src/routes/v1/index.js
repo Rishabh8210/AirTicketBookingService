@@ -1,17 +1,12 @@
 const express = require('express');
 const { BookingController } = require('../../controllers/index');
 const router = express.Router();
+const { createChannel } = require('../../utils/messageQueue')
 
-router.get('/hello', (req, res) => {
-    res.status(200).json({
-        data: {},
-        message: "Hello User, I hope you're doing well",
-        status: true,
-        err: {}
-    });
-})
+const bookingController = new BookingController()
 
-router.post('/bookings', BookingController.createBooking);
-router.patch('/bookings/:id', BookingController.cancelBooking);
+router.post('/bookings', bookingController.createBooking);
+router.post('/publish', bookingController.sendMessageToQueue);
+router.patch('/bookings/:id', bookingController.cancelBooking);
 
 module.exports = router;

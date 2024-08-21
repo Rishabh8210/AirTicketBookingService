@@ -11,3 +11,8 @@
     - `PORT = <PORT>`
     - `DB_SYNC = true` use true when you want to sync your db else just comment it or remove it form `.env` file.
     - `FLIGHT_SERVICE_PATH='<FLIGHT SERVICE PATH/LINK>'` for example `'http://localhost:3000'`
+
+
+
+
+### ![image](https://github.com/user-attachments/assets/12305222-cbc7-487f-b962-46961fec1836)
