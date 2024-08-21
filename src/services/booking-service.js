@@ -1,11 +1,13 @@
 const axios = require('axios')
-const {FLIGHT_SERVICE_PATH} = require('../config/serverConfig')
+const {FLIGHT_SERVICE_PATH, AUTH_SERVICE_PATH, REMAINDER_BINDING_KEY} = require('../config/serverConfig')
 const { BookingRepository } = require('../repository/index');
 const { ServiceError } = require('../utils/errors');
 
+const { createChannel, publishMessage } = require('../utils/messageQueue');
+
 class BookingService {
     constructor(){
-        this.bookingRepository = new BookingRepository();     
+        this.bookingRepository = new BookingRepository();  
     }
 
     #getRefundableAmount(bookedTime, flightDepartureTime, price) {
@@ -40,9 +42,9 @@ class BookingService {
         try {
             const flightId = data.flightId;
             const getFlightRequestUrl = `${FLIGHT_SERVICE_PATH}/api/v1/flights/${flightId}`;
-            const response = await axios.get(getFlightRequestUrl);
-            // console.log(response)
-            const flightData = response.data.data;
+            const flightResponse = await axios.get(getFlightRequestUrl);
+            // console.log(flightResponse)
+            const flightData = flightResponse.data.data;
 
             let priceOfTheFlight = flightData.price;
             if(data.noOfSeats > flightData.totalSeats){
@@ -52,14 +54,23 @@ class BookingService {
                     'Insufficient seats in the flight',
                 )
             }
-            const totalCost = priceOfTheFlight * data.noOfSeats;
-            const bookingPayload = {...data, totalCost};
+            const totalCosts = priceOfTheFlight * data.noOfSeats;
+            const bookingPayload = {...data, totalCosts};
             const booking = await this.bookingRepository.create(bookingPayload);
             console.log(booking)
             const updateFlightRequestUrl = `${FLIGHT_SERVICE_PATH}/api/v1/flights/${booking.flightId}`
             await axios.patch(updateFlightRequestUrl, {totalSeats: flightData.totalSeats - booking.noOfSeats})
             const finalBooking = await this.bookingRepository.update(booking.id, {status: "Booked"});
-            return finalBooking;
+
+            const getUserRequestUrl = `${AUTH_SERVICE_PATH}/api/v1/users/${booking.userId}`;
+            const userResponse = await axios.get(getUserRequestUrl);
+            const userDetails = userResponse.data.data;
+            
+            console.log(userDetails);
+            const ticket = {...flightData, ...userDetails, ...finalBooking};
+            const channel = await createChannel();
+            await publishMessage(channel, REMAINDER_BINDING_KEY, JSON.stringify(ticket));
+            return ticket;
         } catch (error) {
             console.log(error)
             if(error.name == 'RepositoryError' || error.name == 'ValidationError') {
